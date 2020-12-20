@@ -1,9 +1,6 @@
-export default function SudokuSovler (rawString) {
+export default function SudokuSovler (problemString) {
 
-  const string = rawString ? rawString :
-    '..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
-
-  const splitIntoRows = (problemString) => {
+  function splitIntoRows (problemString) {
     return Array(9)
       .fill(null)
       .map((row, i) => {
@@ -11,19 +8,17 @@ export default function SudokuSovler (rawString) {
       });
   };
 
-  const createArray = (problemString) => {
+  function createArray (problemString) {
     return splitIntoRows(problemString).map((row) =>
       parseToNumbers(row.split(''))
     );
   };
 
-  const parseToNumbers = (array) => {
+  function parseToNumbers (array) {
     return array.map((item) => (item === '.' ? null : Number(item)));
   };
 
-  const solutionArray = createArray(string);
-
-  const renderColumns = (array) => {
+  function renderColumns (array) {
     return Array(9)
       .fill(null)
       .map((col, i) => {
@@ -31,7 +26,7 @@ export default function SudokuSovler (rawString) {
       });
   };
 
-  const renderGroups = (arr) => {
+  function renderGroups (arr) {
     return Array(9)
       .fill(null)
       .map((_, i) => {
@@ -47,17 +42,17 @@ export default function SudokuSovler (rawString) {
       });
   };
 
-  const inRow = (item, row) => row.indexOf(item) >= 0;
-  const inColumn = (item, column) => column.indexOf(item) >= 0;
-  const inGroup = (item, group) => group.indexOf(item) >= 0;
-  const getGroupIdx = (row, col) => {
+  function inRow (item, row) row.indexOf(item) >= 0;
+  function inColumn (item, column) column.indexOf(item) >= 0;
+  function inGroup (item, group) group.indexOf(item) >= 0;
+  function getGroupIdx (row, col) {
     return Math.floor(col / 3) + 3 * Math.floor(row / 3);
   };
-  const isSolved = (array) =>
-    array.filter((row) => row.filter((item) => item === null).length > 0)
-      .length === 0;
+  function isSolved (array)
+  array.filter((row) => row.filter((item) => item === null).length > 0)
+    .length === 0;
 
-  const solve = (puzzleArray) => {
+  function solve (puzzleArray) {
     if (isSolved(puzzleArray)) return puzzleArray;
     else return solve(guessSolution(puzzleArray));
 
@@ -88,10 +83,10 @@ export default function SudokuSovler (rawString) {
             // and restart the process
             solution[row][col] = options[0];
             solvable = true;
-            console.log(`${row}:${col}`);
-            console.log(puzzleArray[row][col]);
-            console.log(solution[row][col]);
-            console.log(options);
+            // console.log(`${row}:${col}`);
+            // console.log(puzzleArray[row][col]);
+            // console.log(solution[row][col]);
+            // console.log(options);
           }
         }
       }
@@ -100,8 +95,12 @@ export default function SudokuSovler (rawString) {
     };
   };
 
-  solve(createArray(string));
-};
+  function createSolutionString (solutionArray) {
+    return solutionArray.flat().join('');
+  };
+
+  createSolutionString(solve(createArray(string)));
+
+}
 
 module.exports = SudokuSolver;
-
