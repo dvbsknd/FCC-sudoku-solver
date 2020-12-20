@@ -1,4 +1,4 @@
-export default function SudokuSovler (problemString) {
+export default function SudokuSovler () {
 
   function splitIntoRows (problemString) {
     return Array(9)
@@ -51,7 +51,7 @@ export default function SudokuSovler (problemString) {
   const isSolved = (array) => array.filter((row) =>
     row.filter((item) => item === null).length > 0).length === 0;
 
-  function solve (puzzleArray) {
+  function findSolution (puzzleArray) {
     if (isSolved(puzzleArray)) return puzzleArray;
     else return solve(guessSolution(puzzleArray));
 
@@ -98,6 +98,7 @@ export default function SudokuSovler (problemString) {
     return solutionArray.flat().join('');
   };
 
-  createSolutionString(solve(createArray(string)));
-
+  this.solve = function (problemString) {
+    return createSolutionString(findSolution(createArray(problemString)))
+  }
 };
