@@ -1,4 +1,11 @@
 export default function SudokuSovler () {
+  this.check = function (problemString) {
+    throw new Error('Check needs to be implemented');
+  };
+
+  this.solve = function (problemString) {
+    return createSolutionString(findSolution(createArray(problemString)));
+  };
 
   function splitIntoRows (problemString) {
     return Array(9)
@@ -53,25 +60,24 @@ export default function SudokuSovler () {
 
   function findSolution (puzzleArray) {
     if (isSolved(puzzleArray)) return puzzleArray;
-    else return solve(guessSolution(puzzleArray));
+    else return findSolution(guessSolution(puzzleArray));
 
     function guessSolution (puzzleArray) {
       const solution = puzzleArray.map((row) => row.map((col) => col));
       const guesses = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-      const answers = Array(9).fill(Array(9).fill(null));
 
       // Iterate over entire array, row by column
       let solvable = false;
       for (let row = 0; row < solution.length; row++) {
         for (let col = 0; col < solution[row].length; col++) {
           if (puzzleArray[row][col] !== null) continue;
-          let options = [];
+          const options = [];
           // Iterate over guesses and keep those that are valid
           for (let i = 0; i < guesses.length; i++) {
-            let guess = guesses[i];
-            let currentRow = solution[row];
-            let currentCol = renderColumns(solution)[col];
-            let currentGroup = renderGroups(solution)[getGroupIdx(row, col)];
+            const guess = guesses[i];
+            const currentRow = solution[row];
+            const currentCol = renderColumns(solution)[col];
+            const currentGroup = renderGroups(solution)[getGroupIdx(row, col)];
             if (inRow(guess, currentRow)) continue;
             if (inColumn(guess, currentCol)) continue;
             if (inGroup(guess, currentGroup)) continue;
@@ -97,8 +103,4 @@ export default function SudokuSovler () {
   function createSolutionString (solutionArray) {
     return solutionArray.flat().join('');
   };
-
-  this.solve = function (problemString) {
-    return createSolutionString(findSolution(createArray(problemString)))
-  }
 };
