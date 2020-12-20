@@ -42,15 +42,14 @@ export default function SudokuSovler (problemString) {
       });
   };
 
-  function inRow (item, row) row.indexOf(item) >= 0;
-  function inColumn (item, column) column.indexOf(item) >= 0;
-  function inGroup (item, group) group.indexOf(item) >= 0;
-  function getGroupIdx (row, col) {
+  const inRow = (item, row) => row.indexOf(item) >= 0;
+  const inColumn = (item, column) => column.indexOf(item) >= 0;
+  const inGroup = (item, group) => group.indexOf(item) >= 0;
+  const getGroupIdx = (row, col) => {
     return Math.floor(col / 3) + 3 * Math.floor(row / 3);
   };
-  function isSolved (array)
-  array.filter((row) => row.filter((item) => item === null).length > 0)
-    .length === 0;
+  const isSolved = (array) => array.filter((row) =>
+    row.filter((item) => item === null).length > 0).length === 0;
 
   function solve (puzzleArray) {
     if (isSolved(puzzleArray)) return puzzleArray;
@@ -101,6 +100,4 @@ export default function SudokuSovler (problemString) {
 
   createSolutionString(solve(createArray(string)));
 
-}
-
-module.exports = SudokuSolver;
+};
