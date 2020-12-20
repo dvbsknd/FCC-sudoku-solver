@@ -1,10 +1,15 @@
 export default function SudokuSovler () {
+  function validateInput (string) {
+    if (typeof string === 'string' && string.length === 9 * 9) return string;
+    else throw new Error('Expected puzzle to be 81 characters long');
+  };
+
   this.check = function (problemString) {
     throw new Error('Check needs to be implemented');
   };
 
   this.solve = function (problemString) {
-    return createSolutionString(findSolution(createArray(problemString)));
+    return createSolutionString(findSolution(createArray(validateInput(problemString))));
   };
 
   function splitIntoRows (problemString) {
