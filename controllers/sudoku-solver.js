@@ -13,6 +13,11 @@ SudokuSolver.prototype.solve = function (puzzleString) {
   return createSolutionString(findSolution(createArray(validatePuzzleString(puzzleString))));
 };
 
+SudokuSolver.prototype.parseCoordinate = function (coord) {
+  if (/^[A-Z][1-9]$/.test(coord) !== true) throw new Error('Invalid coordinate');
+  else return { row: 'ABCDEFGHI'.indexOf(coord[0]), col: Number(coord[1]) + 1 };
+};
+
 export function validatePuzzleString (puzzleString) {
   if (typeof puzzleString !== 'string') throw new Error('Expected puzzle to be a string');
   if (puzzleString.length !== 9 * 9) throw new Error('Expected puzzle to be 81 characters long');

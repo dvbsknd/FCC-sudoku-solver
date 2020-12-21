@@ -19,6 +19,14 @@ module.exports = function (app) {
 
   app.route('/api/check')
     .post((req, res) => {
+      try {
+        const { puzzle, coordinate, value } = req.body;
+        const { row, col } = solver.parseCoordinate(coordinate);
+        const parsed = solver.check({ number: value, row, col }, puzzle);
+        res.json({ parsed });
+      } catch (err) {
+        res.error(err);
+      };
     });
 
   app.route('/api/solve')
