@@ -95,7 +95,7 @@ export function findSolution (puzzleArray) {
       }
     }
     if (solvable) return rows;
-    else throw new Error('Can\'t solve this one');
+    else throw new Error('Puzzle cannot be solved');
   };
 };
 
