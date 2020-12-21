@@ -22,8 +22,8 @@ module.exports = function (app) {
       try {
         const { puzzle, coordinate, value } = req.body;
         const { row, col } = solver.parseCoordinate(coordinate);
-        const parsed = solver.check({ number: value, row, col }, puzzle);
-        res.json({ parsed });
+        const valid = solver.check({ number: value, row, col }, puzzle);
+        res.json({ valid });
       } catch (err) {
         res.error(err);
       };
