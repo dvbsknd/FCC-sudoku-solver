@@ -16,7 +16,7 @@ SudokuSolver.prototype.solve = function (puzzleString) {
 export function validatePuzzleString (puzzleString) {
   if (typeof puzzleString !== 'string') throw new Error('Expected puzzle to be a string');
   if (puzzleString.length !== 9 * 9) throw new Error('Expected puzzle to be 81 characters long');
-  if (/^[1-9.]*$/.test(puzzleString)) throw new Error('Invalid characters in puzzle');
+  if (/^[1-9.]*$/.test(puzzleString) !== true) throw new Error('Invalid characters in puzzle');
   else return puzzleString;
 };
 
