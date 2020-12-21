@@ -6,7 +6,7 @@ SudokuSolver.prototype.validate = function (puzzleString) {
 };
 
 SudokuSolver.prototype.check = function (guess, puzzleString) {
-  return validateGuess(guess, createArray(validatePuzzleString(puzzleString)));
+  return validateGuess(validateGuessInput(guess), createArray(validatePuzzleString(puzzleString)));
 };
 
 SudokuSolver.prototype.solve = function (puzzleString) {
@@ -15,7 +15,16 @@ SudokuSolver.prototype.solve = function (puzzleString) {
 
 SudokuSolver.prototype.parseCoordinate = function (coord) {
   if (/^[A-Z][1-9]$/.test(coord) !== true) throw new Error('Invalid coordinate');
-  else return { row: 'ABCDEFGHI'.indexOf(coord[0]), col: Number(coord[1]) + 1 };
+  else return { row: 'ABCDEFGHI'.indexOf(coord[0]), col: Number(coord[1]) - 1 };
+};
+
+export function validateGuessInput (guessInput) {
+  const { number: num, row, col } = guessInput;
+  const numIsValid = () => Number.isInteger(num) && num >= 1 && num <= 9;
+  const rowIsValid = () => Number.isInteger(row) && row >= 0 && row <= 8;
+  const colIsValid = () => Number.isInteger(col) && col >= 0 && col <= 8;
+  if (rowIsValid() && colIsValid() && numIsValid()) return guessInput;
+  else throw new Error('Invalid value');
 };
 
 export function validatePuzzleString (puzzleString) {
@@ -51,7 +60,7 @@ export function renderColumns (array) {
     });
 };
 
-export function renderGroups (arr) {
+export function renderRegions (arr) {
   return Array(9)
     .fill(null)
     .map((_, i) => {
@@ -88,7 +97,7 @@ export function findSolution (puzzleArray) {
         // Iterate over guesses and keep those that are valid
         for (let i = 0; i < numbers.length; i++) {
           const number = numbers[i];
-          if (validateGuess({ number, row, col }, rows) !== true) continue;
+          if (validateGuess({ number, row, col }, rows).valid !== true) continue;
           options.push(number);
         }
         if (options.length === 1) {
@@ -107,18 +116,26 @@ export function findSolution (puzzleArray) {
 export function validateGuess (guess, rows) {
   const inRow = (item, row) => row.indexOf(item) >= 0;
   const inColumn = (item, column) => column.indexOf(item) >= 0;
-  const inGroup = (item, group) => group.indexOf(item) >= 0;
-  const groupIdx = (row, col) => {
+  const inRegion = (item, region) => region.indexOf(item) >= 0;
+  const regionIdx = (row, col) => {
     return Math.floor(col / 3) + 3 * Math.floor(row / 3);
   };
 
   const { number, row, col } = guess;
   const columns = renderColumns(rows);
-  const groups = renderGroups(rows);
+  const regions = renderRegions(rows);
   const currentRow = rows[row];
   const currentCol = columns[col];
-  const currentGroup = groups[groupIdx(row, col)];
-  return !inRow(number, currentRow) && !inColumn(number, currentCol) && !inGroup(number, currentGroup);
+  const currentRegion = regions[regionIdx(row, col)];
+
+  const conflict = [];
+  if (inRow(number, currentRow)) conflict.push('row');
+  if (inColumn(number, currentCol)) conflict.push('column');
+  if (inRegion(number, currentRegion)) conflict.push('region');
+
+  console.log(guess, currentRow, currentCol, currentRegion, conflict);
+  const valid = conflict.length === 0;
+  return { valid, conflict };
 };
 
 export function createSolutionString (solutionArray) {

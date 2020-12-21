@@ -21,9 +21,10 @@ module.exports = function (app) {
     .post((req, res) => {
       try {
         const { puzzle, coordinate, value } = req.body;
+        if (!puzzle || !coordinate || !value) throw new Error('Required field(s) missing');
+        const number = Number(value);
         const { row, col } = solver.parseCoordinate(coordinate);
-        const valid = solver.check({ number: value, row, col }, puzzle);
-        res.json({ valid });
+        res.json(solver.check({ number, row, col }, puzzle));
       } catch (err) {
         res.error(err);
       };
