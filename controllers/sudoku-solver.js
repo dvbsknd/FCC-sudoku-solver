@@ -1,15 +1,19 @@
 export default function SudokuSolver () {
 };
 
-SudokuSolver.prototype.check = function (puzzleString) {
-  throw new Error('Check needs to be implemented');
+SudokuSolver.prototype.validate = function (puzzleString) {
+  return validatePuzzleString(puzzleString) === puzzleString;
+};
+
+SudokuSolver.prototype.check = function (guess, puzzleString) {
+  return validateGuess(guess, createArray(validatePuzzleString(puzzleString)));
 };
 
 SudokuSolver.prototype.solve = function (puzzleString) {
-  return createSolutionString(findSolution(createArray(this.validate(puzzleString))));
+  return createSolutionString(findSolution(createArray(validatePuzzleString(puzzleString))));
 };
 
-SudokuSolver.prototype.validate = function (puzzleString) {
+export function validatePuzzleString (puzzleString) {
   if (typeof puzzleString === 'string' &&
     puzzleString.length === 9 * 9) return puzzleString;
   else throw new Error('Expected puzzle to be 81 characters long');
@@ -58,12 +62,6 @@ export function renderGroups (arr) {
 };
 
 export function findSolution (puzzleArray) {
-  const inRow = (item, row) => row.indexOf(item) >= 0;
-  const inColumn = (item, column) => column.indexOf(item) >= 0;
-  const inGroup = (item, group) => group.indexOf(item) >= 0;
-  const getGroupIdx = (row, col) => {
-    return Math.floor(col / 3) + 3 * Math.floor(row / 3);
-  };
   const isSolved = (array) => array.filter((row) =>
     row.filter((item) => item === null).length > 0).length === 0;
 
@@ -73,9 +71,7 @@ export function findSolution (puzzleArray) {
   function guessSolution (currentArray) {
     // Create a deep copy of the current array
     const rows = currentArray.map((row) => row.map((col) => col));
-    const guesses = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    const columns = renderColumns(rows);
-    const groups = renderGroups(rows);
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     // Iterate over entire array, row by column
     let solvable = false;
@@ -84,31 +80,39 @@ export function findSolution (puzzleArray) {
         if (puzzleArray[row][col] !== null) continue;
         const options = [];
         // Iterate over guesses and keep those that are valid
-        for (let i = 0; i < guesses.length; i++) {
-          const guess = guesses[i];
-          const currentRow = rows[row];
-          const currentCol = columns[col];
-          const currentGroup = groups[getGroupIdx(row, col)];
-          if (inRow(guess, currentRow)) continue;
-          if (inColumn(guess, currentCol)) continue;
-          if (inGroup(guess, currentGroup)) continue;
-          options.push(guess);
+        for (let i = 0; i < numbers.length; i++) {
+          const number = numbers[i];
+          if (validateGuess({ number, row, col }, rows) !== true) continue;
+          options.push(number);
         }
         if (options.length === 1) {
           // We have a singular solution so update the solution array
           // and restart the process
           rows[row][col] = options[0];
           solvable = true;
-          // console.log(`${row}:${col}`);
-          // console.log(puzzleArray[row][col]);
-          // console.log(solution[row][col]);
-          // console.log(options);
         }
       }
     }
     if (solvable) return rows;
     else throw new Error('Can\'t solve this one');
   };
+};
+
+export function validateGuess (guess, rows) {
+  const inRow = (item, row) => row.indexOf(item) >= 0;
+  const inColumn = (item, column) => column.indexOf(item) >= 0;
+  const inGroup = (item, group) => group.indexOf(item) >= 0;
+  const groupIdx = (row, col) => {
+    return Math.floor(col / 3) + 3 * Math.floor(row / 3);
+  };
+
+  const { number, row, col } = guess;
+  const columns = renderColumns(rows);
+  const groups = renderGroups(rows);
+  const currentRow = rows[row];
+  const currentCol = columns[col];
+  const currentGroup = groups[groupIdx(row, col)];
+  return !inRow(number, currentRow) && !inColumn(number, currentCol) && !inGroup(number, currentGroup);
 };
 
 export function createSolutionString (solutionArray) {
