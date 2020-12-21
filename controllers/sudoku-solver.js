@@ -70,8 +70,9 @@ export function findSolution (puzzleArray) {
   if (isSolved(puzzleArray)) return puzzleArray;
   else return findSolution(guessSolution(puzzleArray));
 
-  function guessSolution (puzzleArray) {
-    const rows = puzzleArray.map((row) => row.map((col) => col));
+  function guessSolution (currentArray) {
+    // Create a deep copy of the current array
+    const rows = currentArray.map((row) => row.map((col) => col));
     const guesses = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const columns = renderColumns(rows);
     const groups = renderGroups(rows);
