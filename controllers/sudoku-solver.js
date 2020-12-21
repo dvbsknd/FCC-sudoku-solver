@@ -133,7 +133,6 @@ export function validateGuess (guess, rows) {
   if (inColumn(number, currentCol)) conflict.push('column');
   if (inRegion(number, currentRegion)) conflict.push('region');
 
-  console.log(guess, currentRow, currentCol, currentRegion, conflict);
   const valid = conflict.length === 0;
   return { valid, conflict };
 };
