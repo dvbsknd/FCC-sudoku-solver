@@ -58,22 +58,100 @@ suite('Functional Tests', () => {
 
   suite('POST request to /api/check', () => {
     const endpoint = '/api/check';
-    test('Check a puzzle placement with all fields');
+    test('Check a puzzle placement with all fields', () => {
+      const data = { puzzle, coordinate: 'A1', value: '7' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 200);
+          assert.isTrue(res.body.valid);
+          assert.isEmpty(res.body.conflict);
+        });
+    });
 
-    test('Check a puzzle placement with single placement conflict');
+    test('Check a puzzle placement with single placement conflict', () => {
+      const data = { puzzle, coordinate: 'A2', value: '1' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 200);
+          assert.isFalse(res.body.valid);
+          assert.sameMembers(res.body.conflict, ['row']);
+        });
+    });
 
-    test('Check a puzzle placement with multiple placement conflicts');
+    test('Check a puzzle placement with multiple placement conflicts', () => {
+      const data = { puzzle, coordinate: 'A1', value: '1' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 200);
+          assert.isFalse(res.body.valid);
+          assert.sameMembers(res.body.conflict, ['row', 'column']);
+        });
+    });
 
-    test('Check a puzzle placement with all placement conflicts');
+    test('Check a puzzle placement with all placement conflicts', () => {
+      const data = { puzzle, coordinate: 'A1', value: '5' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 200);
+          assert.isFalse(res.body.valid);
+          assert.sameMembers(res.body.conflict, ['row', 'column', 'region']);
+        });
+    });
 
-    test('Check a puzzle placement with missing required fields');
+    test('Check a puzzle placement with missing required fields', () => {
+      const data = { puzzle, value: '5' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 400);
+          // fCC test runner breaks if brackets are used in assertions!
+          assert.match(res.body.error, /^Required field.* missing$/);
+        });
+    });
 
-    test('Check a puzzle placement with invalid characters');
+    test('Check a puzzle placement with invalid characters', () => {
+      const data = { puzzle, coordinate: 'X1', value: '7' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 400);
+          assert.equal(res.body.error, 'Invalid value');
+        });
+    });
 
-    test('Check a puzzle placement with incorrect length');
+    test('Check a puzzle placement with incorrect length', () => {
+      const tooShortPuzzle = puzzle.slice(0, 80);
+      const data = { puzzle: tooShortPuzzle, coordinate: 'A1', value: '7' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 400);
+          assert.equal(res.body.error, 'Expected puzzle to be 81 characters long');
+        });
+    });
 
-    test('Check a puzzle placement with invalid placement coordinate');
+    test('Check a puzzle placement with invalid placement coordinate', () => {
+      const data = { puzzle, coordinate: 'A0', value: '7' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 400);
+          assert.equal(res.body.error, 'Invalid coordinate');
+        });
+    });
 
-    test('Check a puzzle placement with invalid placement value');
+    test('Check a puzzle placement with invalid placement value', () => {
+      const data = { puzzle, coordinate: 'A1', value: '0' };
+      chai.request(app).post(endpoint).send(data)
+        .end((err, res) => {
+          assert.isNull(err);
+          assert.equal(res.status, 400);
+          assert.equal(res.body.error, 'Invalid value');
+        });
+    });
   });
 });
