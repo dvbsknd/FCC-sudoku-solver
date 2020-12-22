@@ -4,14 +4,14 @@ module.exports = function (app) {
   const solver = new SudokuSolver();
 
   app.use((req, res, next) => {
-    console.log('[API]', req.method, req.body);
+    if (process.env.NODE_ENV === 'development') console.log('[API]', req.method, req.body);
     next();
   });
 
   app.use((req, res, next) => {
     res.error = (err) => {
-      console.log('[API] Error:', err);
-      res.status(200);
+      if (process.env.NODE_ENV !== 'test') console.log('[API] Error:', err);
+      res.status(400);
       res.json({ error: err.message });
     };
     next();
